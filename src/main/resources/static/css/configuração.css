@@ -1,0 +1,25 @@
+/* CONFIG CONTENT */
+.config-content {
+    background-color: rgb(128, 162, 137);
+    margin-top: 70px;
+    margin-left: 250px;
+    padding: 20px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+/* TITULO DA PAGINA */
+.row-title {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.form-label{
+    color: white;
+    font-size: 20px;
+}
+
+.btn {
+    width: 70px;
+}

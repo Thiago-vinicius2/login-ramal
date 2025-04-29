@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* NAV BAR */
+.navbar {
+    background: linear-gradient(to left, #000000, #248631);
+    height: 70px;
+}
+
+.text-ramal i,
+.text-ramal span {
+    color: #e8faea;
+    font-size: 30px;
+    font-family: 'Trebuchet MS', sans-serif;
+    align-items: center;
+}
+
+.text-login {
+    color: #e8faea;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* SIDE-BAR */
+.sidebar-item {
+    background-color: rgb(36, 37, 36);
+    margin-top: 30px;
+    width: 250px;
+    height: 100vh;
+    padding: 20px;
+}
+
+.nav-link {
+    color: #99d1a2;
+    font-size: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.nav-link:hover {
+    color: #22da3a;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+}
+
+/* DROPDOWN NA SIDE-BAR */
+.dropdown-menu {
+    background-color: #121212;
+}
+
+.dropdown-item {
+    color: #99d1a2;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: 0.2s;
+}
+
+.dropdown-item:hover {
+    color: #22da3a;
+    background-color: #1a1a1a;
+    border-radius: 5px;
+}
