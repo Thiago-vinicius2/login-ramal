@@ -1,7 +1,7 @@
 Create TABLE ramal (
 	id INT PRIMARY KEY IDENTITY,
 	numero_ramal INT NOT NULL,
-	status_ramal VARCHAR(10) NOT NULL CHECK (status_ramal IN ('Disponivel', 'Ocupado', 'Manutencao'))
+	status_ramal VARCHAR(10) NOT NULL CHECK (status_ramal IN ('Disponivel', 'Ocupado'))
 );
 
 
