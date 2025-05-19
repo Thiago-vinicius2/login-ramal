@@ -22,10 +22,13 @@ import java.util.Optional;
 public class RamalService {
 
     @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
     private RamalRepository ramalRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private RangeService rangeService;
 
     // MOSTRA TODOS OS RAMAIS
     public List<RamalModel> todosRamais() {
@@ -42,15 +45,17 @@ public class RamalService {
         return ramalRepository.findByStatusRamal(StatusRamal.Ocupado);
     }
 
-
     // BUSCA RAMAL POR NUMERO
     public Optional<RamalModel> buscaRamal(Integer numeroRamal) {
         return ramalRepository.findByNumeroRamal(numeroRamal);
     }
 
-
     // FAZ LOGIN NO RAMAL
     public ResponseLoginRamalDto fazerLoginRamal(LoginRamalDto dto){
+
+        // VERIFICA SE O RAMAL ESTÁ DENTRO DO RANGE DEFINIDO
+        if(!rangeService.isDentroDoRange(dto.numeroRamal()))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Acesso Negado. O ramal está fora do intervalo definido");
 
         // VERIFICA SE O EMAIL EXISTE
         UsuarioModel usuario = usuarioRepository.findByEmail(dto.email())
