@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 @Service
 @Getter
 public class RangeService {
-    private Integer inicio;
-    private Integer fim;
+    private Integer inicio = null;
+    private Integer fim = null;
 
     public void definirIntervalo(Integer inicio, Integer fim) {
         this.inicio = inicio;
@@ -15,6 +15,9 @@ public class RangeService {
     }
 
     public boolean isDentroDoRange (Integer numero) {
-        return inicio != null && fim != null && numero >= inicio && numero <= fim;
+        if (inicio == null || fim == null){
+            return true;
+        }
+        return numero >= inicio && numero <= fim;
     }
 }

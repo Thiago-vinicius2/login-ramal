@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,21 +28,19 @@ public class RamalController {
     @Autowired
     private RangeService rangeService;
 
+    // FILTRA LISTA DO RAMALMODEL DEFINIDA PELA INTERVALO
+    private List<RamalModel> filtrarPorRange(List<RamalModel> lista) {
+        return lista.stream()
+                .filter(r -> rangeService.isDentroDoRange(r.getNumeroRamal()))
+                .collect(Collectors.toList());
+    }
+
     // TODOS OS RAMAIS (DISPONIVEL - OCUPADO)
     @GetMapping("/todos")
-    public ResponseEntity<List<ResponseLoginRamalDto>> listarTodos(
-            @RequestParam(required = false) Integer inicio,
-            @RequestParam(required = false) Integer fim) {
-        List<RamalModel> ramais = ramalService.todosRamais();
+    public ResponseEntity<List<ResponseLoginRamalDto>> listarTodos() {
+        List<RamalModel> ramais = filtrarPorRange(ramalService.todosRamais());
 
-        if (inicio != null && fim != null ){
-            ramais = ramais.stream()
-                    .filter(r -> r.getNumeroRamal() >= inicio && r.getNumeroRamal() <= fim)
-                    .collect(Collectors.toList());
-        }
-
-        List<ResponseLoginRamalDto> resposta =
-                ramais.stream() // -> transforma para dto
+        List<ResponseLoginRamalDto> resposta = ramais.stream() // -> transforma para dto
                 .map(ResponseLoginRamalDto::new) // -> → para cada ramal, cria um novo ResponseLoginRamalDto
                 .toList(); // -> transforma em lista
 
@@ -49,7 +49,7 @@ public class RamalController {
 
     // RAMAIS DEFINIDOS POR RANGE
     @GetMapping("/range")
-    public ResponseEntity<String> definirRanger(
+    public ResponseEntity<String> definirRange(
             @RequestParam(required = false) Integer inicio,
             @RequestParam(required = false) Integer fim) {
 
@@ -57,7 +57,7 @@ public class RamalController {
         int ramalMax = 3625;
 
         if(inicio >= fim) {
-            return ResponseEntity.badRequest().body("Intervalo Invalido");
+            return ResponseEntity.badRequest().body("Intervalo Invalido: Inicio deve ser menor que o fim.");
         }
 
         if (inicio < ramalMin || fim > ramalMax)
@@ -68,45 +68,35 @@ public class RamalController {
         return ResponseEntity.ok("Intervalo definido: " + inicio + " a " + fim);
     }
 
+    // OBTER O RANGE ATUAL
+    @GetMapping("/range/atual")
+    public ResponseEntity<Map<String, Integer>> obterRangeAtual() {
+        Map<String, Integer> response = new HashMap<>();
+        response.put("inicio", rangeService.getInicio());
+        response.put("fim", rangeService.getFim());
+        return ResponseEntity.ok(response);
+    }
+
     // MOSTRA RAMAIS DISPONIVEIS
     @GetMapping("/disponiveis")
-    public ResponseEntity<List<ResponseLoginRamalDto>> listarRamaisDisponiveis(
-            @RequestParam(required = false) Integer inicio,
-            @RequestParam(required = false) Integer fim) {
+    public ResponseEntity<List<ResponseLoginRamalDto>> listarRamaisDisponiveis(){
+        List<RamalModel> disponiveis = filtrarPorRange(ramalService.listarRamaisDisponiveis());
 
-        List<RamalModel> disponiveis = ramalService.listarRamaisDisponiveis();
-
-        if (inicio != null && fim != null ){
-            disponiveis = disponiveis.stream()
-                    .filter(r -> r.getNumeroRamal() >= inicio && r.getNumeroRamal() <= fim)
-                    .collect(Collectors.toList());
-        }
-
-        List<ResponseLoginRamalDto> resposta =
-                disponiveis.stream() // -> transforma para dto
-                .map(ResponseLoginRamalDto::new) // -> → para cada ramal, cria um novo ResponseLoginRamalDto
-                .toList(); // -> transforma em lista
+        List<ResponseLoginRamalDto> resposta = disponiveis.stream()
+                .map(ResponseLoginRamalDto::new)
+                .toList();
 
         return ResponseEntity.ok(resposta);
     }
 
     // MOSTRA RAMAIS OCUPADOS
     @GetMapping("/ocupados")
-    public ResponseEntity<List<ResponseLoginRamalDto>> listarRamaisOcupados(
-            @RequestParam(required = false) Integer inicio,
-            @RequestParam(required = false) Integer fim) {
-        List<RamalModel> ocupados = ramalService.listarRamaisOcupados();
+    public ResponseEntity<List<ResponseLoginRamalDto>> listarRamaisOcupados() {
+        List<RamalModel> ocupados = filtrarPorRange(ramalService.listarRamaisOcupados());
 
-        if (inicio != null && fim != null ){
-            ocupados = ocupados.stream()
-            .filter(r -> r.getNumeroRamal() >= inicio && r.getNumeroRamal() <= fim)
-            .collect(Collectors.toList());
-        }
-
-        List<ResponseLoginRamalDto> resposta =
-                ocupados.stream() // -> transforma para dto
-                .map(ResponseLoginRamalDto::new) // -> → para cada ramal, cria um novo ResponseLoginRamalDto
-                .toList(); // -> transforma em lista
+        List<ResponseLoginRamalDto> resposta = ocupados.stream()
+                .map(ResponseLoginRamalDto::new) //
+                .toList();
 
         return ResponseEntity.ok(resposta);
     }
@@ -129,7 +119,7 @@ public class RamalController {
                 @RequestParam(required = false) Integer fim
     ){
         // ATUALIZA O RANGE NO LOGIN
-        if( inicio!= null && fim != null) {
+        if (inicio!= null && fim != null) {
             rangeService.definirIntervalo(inicio, fim);
     }
 

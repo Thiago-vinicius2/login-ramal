@@ -12,9 +12,20 @@ const btnFiltrar = document.getElementById("filtrar");
 const savedInicio = localStorage.getItem("rangeInicio");
 const savedFim = localStorage.getItem("rangeFim");
 
-if (savedInicio && savedFim) {
+if (!savedInicio || !savedFim) {
+    fetch("http://localhost:8080/ramais/range/atual")
+        .then(res => res.json())
+        .then(data => {
+            if (data.inicio !== null && data.fim !== null) {
+                rangeInicio = data.inicio;
+                rangeFim = data.fim;
+            }
+            atualizaRangeInicio(3601, 3625);
+        });
+} else {
     rangeInicio = parseInt(savedInicio);
     rangeFim = parseInt(savedFim);
+    atualizaRangeInicio(3601, 3625);
 }
 
 // PREENCHE O SELECT INICIO 
@@ -35,13 +46,12 @@ function atualizaRangeInicio(ramalMin, ramalMax) {
         }
 
         selectInicio.appendChild(optionInicio);
-
-    atualizaRangeFim();
     };
+    atualizaRangeFim();
 }
 
 // PREENCHE O SELECT FIM (COM BASE NO INICIO SELECIONADO)
-function atualizaRangeFim(){
+function atualizaRangeFim() {
     const inicioSelecionado = parseInt(selectInicio.value);
     selectFim.innerHTML = "";
 
@@ -55,7 +65,7 @@ function atualizaRangeFim(){
         if (i === rangeFim) {
             optionFim.selected = true;
         }
-        
+
         selectFim.appendChild(optionFim);
     }
 };
@@ -68,7 +78,7 @@ selectInicio.addEventListener("change", (e) => {
 
 // ATUALIZA O VALOR FINAL DO INTERVALO QUANDO O USUARIO MUDAR O SELECT 
 selectFim.addEventListener("change", (e) => {
-    rangeFim = parseInt(e.target.value);  
+    rangeFim = parseInt(e.target.value);
 })
 
 // SALVA O INTERVALO E REDIRECIONA PARA PAGINA PRINCIPAL
@@ -82,9 +92,9 @@ btnFiltrar.addEventListener("click", () => {
     localStorage.setItem("rangeInicio", rangeInicio);
     localStorage.setItem("rangeFim", rangeFim);
 
-    // REDIRECIONA PARA A PAGINA PRINCIPAL COM INTERVALO SALVO
-    window.location.href = "index.html";
+    fetch(`http://localhost:8080/ramais/range?inicio=${rangeInicio}&fim=${rangeFim}`, {
+    }).then(() => {
+        window.location.href = "index.html";
+    });
 });
 
-// INICIA OS SELECT E PASSA O INTERVALO COMPLETO DE RAMAIS
-atualizaRangeInicio(3601, 3625)
